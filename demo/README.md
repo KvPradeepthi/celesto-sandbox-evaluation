@@ -34,6 +34,10 @@ Open [`demo_recording.html`](demo_recording.html) directly in any web browser (C
 - Simulated animated terminal playback with adjustable speeds (1x, 2x, 5x, Instant).
 - Scrubbable progress bar, step navigation pills, and complete transcript viewer.
 
+### Option 4: Full HD MP4 Video Recording (`demo_recording.mp4`)
+A pre-rendered 58-second 720p H.264 video recording ([`demo_recording.mp4`](demo_recording.mp4)) showcasing the entire terminal interaction, from health check to isolation and ledger verification. Can be played in VLC, Windows Media Player, QuickTime, or uploaded directly to any review portal.
+- Can be re-generated deterministically anytime via: `python scripts/record_demo_video.py`
+
 ---
 
 ## What the Demo Verifies

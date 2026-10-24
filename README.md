@@ -49,9 +49,9 @@ The repository includes a reproducible, automated 20-run evaluation script (`scr
 | **Timed Out** | **2** |
 | **Rejected at API Boundary** | **2** |
 | **Unexpected Errors** | **0** |
-| **Submission Latency (p50)** | **9.52 ms** |
-| **Submission Latency (p95)** | **14.67 ms** |
-| **Maximum Submission Latency** | **18.51 ms** |
+| **Submission Latency (p50)** | **13.68 ms** |
+| **Submission Latency (p95)** | **20.02 ms** |
+| **Maximum Submission Latency** | **20.12 ms** |
 
 Raw evaluation measurements are recorded in [reports/reliability-results.json](reports/reliability-results.json).  
 Detailed report: [reports/reliability-eval.md](reports/reliability-eval.md).
@@ -129,6 +129,7 @@ An end-to-end demo script is provided in `demo/`:
 - `demo/demo.ps1`: Interactive PowerShell demo script verifying health, run submission, execution, failure, and ledger querying.
 - `demo/run_demo.py`: Python CLI demo runner testing the complete workflow and printing formatted results.
 - `demo/demo_recording.html`: Visual standalone HTML5 replay of the control plane execution trace and API transactions.
+- `demo/demo_recording.mp4`: Pre-rendered 58s 720p H.264 video recording of the complete terminal verification session.
 
 See [demo/README.md](demo/README.md) for full instructions.
 
