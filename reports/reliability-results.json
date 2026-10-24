@@ -1,0 +1,15 @@
+{
+  "attempted": 20,
+  "accepted": 18,
+  "succeeded": 12,
+  "failed": 4,
+  "timed_out": 2,
+  "rejected": 2,
+  "unexpected_errors": 0,
+  "latency_ms": {
+    "p50": 40.91,
+    "p95": 65.26,
+    "max": 67.24
+  },
+  "generated_at": "2026-10-24T08:14:43Z"
+}

@@ -1,0 +1,5 @@
+[
+  {"command": "echo hello", "expected_status": "succeeded"},
+  {"command": "false", "expected_status": "failed"},
+  {"command": "sleep forever", "expected_status": "timed_out"}
+]

@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Celesto Sandbox Control Plane - Interactive Terminal Demo</title>
+  <style>
+    :root {
+      --bg-color: #0d1117;
+      --card-bg: #161b22;
+      --border-color: #30363d;
+      --text-main: #c9d1d9;
+      --text-muted: #8b949e;
+      --accent-green: #3fb950;
+      --accent-blue: #58a6ff;
+      --accent-yellow: #d29922;
+      --accent-red: #f85149;
+      --accent-purple: #bc8cff;
+      --terminal-bg: #030712;
+      --font-mono: 'Consolas', 'Fira Code', 'Cascadia Code', Menlo, Monaco, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    header {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .header-title h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #f0f6fc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      background: #1f6feb26;
+      color: var(--accent-blue);
+      border: 1px solid #1f6feb66;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-family: var(--font-mono);
+    }
+
+    .header-title p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .terminal-window {
+      background: var(--terminal-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .terminal-header {
+      background: #111827;
+      border-bottom: 1px solid var(--border-color);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+
+    .window-title {
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    .terminal-body {
+      padding: 16px 20px;
+      font-family: var(--font-mono);
+      font-size: 0.86rem;
+      line-height: 1.5;
+      min-height: 520px;
+      max-height: 620px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .line-prompt { color: var(--accent-blue); }
+    .line-cmd { color: #f0f6fc; font-weight: 600; }
+    .line-comment { color: var(--text-muted); }
+    .line-success { color: var(--accent-green); }
+    .line-error { color: var(--accent-red); }
+    .line-warn { color: var(--accent-yellow); }
+    .line-info { color: var(--accent-purple); }
+    .line-json { color: #79c0ff; }
+
+    .controls-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .timeline-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .timeline-slider {
+      flex: 1;
+      accent-color: var(--accent-blue);
+      cursor: pointer;
+    }
+
+    .timeline-time {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      min-width: 50px;
+    }
+
+    .button-group {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      background: #21262d;
+      color: #c9d1d9;
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:hover {
+      background: #30363d;
+      border-color: #8b949e;
+      color: #f0f6fc;
+    }
+
+    .btn-primary {
+      background: #238636;
+      border-color: #2ea043;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: #2ea043;
+    }
+
+    .btn.active {
+      background: #388bfd26;
+      border-color: #388bfd;
+      color: var(--accent-blue);
+    }
+
+    .step-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .step-pill {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: #21262d;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .step-pill:hover, .step-pill.active {
+      color: var(--text-main);
+      border-color: var(--accent-blue);
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 15px;
+      background: var(--accent-blue);
+      vertical-align: middle;
+      animation: blink 1s step-start infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-title">
+        <h1>Celesto Sandbox Control Plane <span class="badge">E2E Session Demo</span></h1>
+        <p>Verified run lifecycle, SQLite durable ledger, idempotency deduplication, and fail-explicit isolation.</p>
+      </div>
+      <div>
+        <button id="toggleTranscript" class="btn">View Full Transcript</button>
+      </div>
+    </header>
+
+    <div class="terminal-window">
+      <div class="terminal-header">
+        <div class="window-dots">
+          <div class="dot dot-red"></div>
+          <div class="dot dot-yellow"></div>
+          <div class="dot dot-green"></div>
+        </div>
+        <div class="window-title">bash - celesto-control-plane demo (port 8000)</div>
+        <div style="width: 42px;"></div>
+      </div>
+      <div id="terminalBody" class="terminal-body"><span id="terminalContent"></span><span id="cursor" class="cursor"></span></div>
+    </div>
+
+    <div class="controls-panel">
+      <div class="timeline-container">
+        <button id="playPauseBtn" class="btn btn-primary">Pause</button>
+        <button id="restartBtn" class="btn">Restart</button>
+        <input type="range" id="timelineSlider" class="timeline-slider" min="0" max="100" value="0">
+        <span id="progressLabel" class="timeline-time">0%</span>
+      </div>
+
+      <div class="button-group">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Speed:</span>
+          <button class="btn speed-btn" data-speed="1">1x</button>
+          <button class="btn speed-btn active" data-speed="2">2x</button>
+          <button class="btn speed-btn" data-speed="5">5x</button>
+          <button class="btn speed-btn" data-speed="999">Instant</button>
+        </div>
+
+        <div class="step-pills">
+          <button class="step-pill" data-step="0">1. Health/Ready</button>
+          <button class="step-pill" data-step="1">2. Run Execution</button>
+          <button class="step-pill" data-step="2">3. Ledger Audit</button>
+          <button class="step-pill" data-step="3">4. Idempotency</button>
+          <button class="step-pill" data-step="4">5. Fail Explicit</button>
+          <button class="step-pill" data-step="5">6. Validation</button>
+          <button class="step-pill" data-step="6">7. Run Filter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DEMO_STEPS = [
+      {
+        step: 0,
+        text: `\x1b[34m$\x1b[0m \x1b[1mcurl -s http://localhost:8000/health | jq\x1b[0m\n` +
+`{\n` +
+`  "status": "ok",\n` +
+`  "service": "celesto-control-plane",\n` +
+`  "ledger": "sqlite",\n` +
+`  "sandbox_mode": "mock",\n` +
+`  "ready": true\n` +
+`}\n\n` +
+`\x1b[34m$\x1b[0m \x1b[1mcurl -s http://localhost:8000/ready | jq\x1b[0m\n` +
+`{\n` +
+`  "status": "ok",\n` +
+`  "service": "celesto-control-plane",\n` +
+`  "ledger": "sqlite",\n` +
+`  "sandbox_mode": "mock",\n` +
+`  "ready": true\n` +
+`}\n\n` +
+`\x1b[32m✔ Probes verified: Service is ready and database connection is healthy.\x1b[0m\n\n`
+      },
+      {
+        step: 1,
+        text: `\x1b[34m$\x1b[0m \x1b[1mcurl -X POST http://localhost:8000/runs \\\n` +
+`  -H "Content-Type: application/json" \\\n` +
+`  -d '{"command": "echo \\'Hello from Celesto Sandbox isolation\\'", "timeout_seconds": 30}' | jq\x1b[0m\n` +
+`{\n` +
+`  "run_id": "6883a92f-693b-41c9-8b67-b14d52fe5bcc",\n` +
+`  "status": "queued",\n` +
+`  "command": "echo 'Hello from Celesto Sandbox isolation'",\n` +
+`  "output": null,\n` +
+`  "error": null,\n` +
+`  "created_at": "2026-10-24T08:27:54.569593Z",\n` +
+`  "completed_at": null,\n` +
+`  "sandbox_provider": "mock",\n` +
+`  "idempotency_key": null\n` +
+`}\n\n` +
+`\x1b[32m✔ Accepted (HTTP 202): Command queued in SQLite ledger and dispatched to sandbox runner.\x1b[0m\n\n`
+      },
+      {
+        step: 2,
+        text: `\x1b[34m$\x1b[0m \x1b[1mcurl -s http://localhost:8000/runs/6883a92f-693b-41c9-8b67-b14d52fe5bcc | jq\x1b[0m\n` +
+`{\n` +
+`  "run_id": "6883a92f-693b-41c9-8b67-b14d52fe5bcc",\n` +
+`  "status": "succeeded",\n` +
+`  "command": "echo 'Hello from Celesto Sandbox isolation'",\n` +
+`  "output": "mock execution: echo 'Hello from Celesto Sandbox isolation'\\n",\n` +
+`  "error": null,\n` +
+`  "created_at": "2026-10-24T08:27:54.569593Z",\n` +
+`  "completed_at": "2026-10-24T08:27:54.592465Z",\n` +
+`  "sandbox_provider": "mock",\n` +
+`  "idempotency_key": null\n` +
+`}\n\n` +
+`\x1b[32m✔ State transition verified: queued -> running -> succeeded (22.8ms execution latency).\x1b[0m\n\n`
+      },
+      {
+        step: 3,
+        text: `\x1b[34m# Submitting first request with idempotency_key\x1b[0m\n` +
+`\x1b[34m$\x1b[0m \x1b[1mcurl -X POST http://localhost:8000/runs \\\n` +
+`  -H "Content-Type: application/json" \\\n` +
+`  -d '{"command": "echo \\'Operational task\\'", "idempotency_key": "ops-task-9021"}' | jq .run_id\x1b[0m\n` +
+`"bcf825bd-f641-4c68-8a25-b27c5d3f319d"\n\n` +
+`\x1b[34m# Resubmitting duplicate request with identical idempotency_key\x1b[0m\n` +
+`\x1b[34m$\x1b[0m \x1b[1mcurl -X POST http://localhost:8000/runs \\\n` +
+`  -H "Content-Type: application/json" \\\n` +
+`  -d '{"command": "echo \\'Operational task\\'", "idempotency_key": "ops-task-9021"}' | jq .run_id\x1b[0m\n` +
+`"bcf825bd-f641-4c68-8a25-b27c5d3f319d"\n\n` +
+`\x1b[36m✔ Idempotency guaranteed: Exact match returned without re-executing command in sandbox.\x1b[0m\n\n`
+      },
+      {
+        step: 4,
+        text: `\x1b[34m# Submitting intentional non-zero exit command: 'exit 42'\x1b[0m\n` +
+`\x1b[34m$\x1b[0m \x1b[1mcurl -X POST http://localhost:8000/runs \\\n` +
+`  -H "Content-Type: application/json" \\\n` +
+`  -d '{"command": "exit 42"}' | jq .run_id\x1b[0m\n` +
+`"29320980-e98a-4f4e-b94f-e173ff5e4a6a"\n\n` +
+`\x1b[34m$\x1b[0m \x1b[1mcurl -s http://localhost:8000/runs/29320980-e98a-4f4e-b94f-e173ff5e4a6a | jq\x1b[0m\n` +
+`{\n` +
+`  "run_id": "29320980-e98a-4f4e-b94f-e173ff5e4a6a",\n` +
+`  "status": "failed",\n` +
+`  "command": "exit 42",\n` +
+`  "output": null,\n` +
+`  "error": "sandbox command exited with status 42",\n` +
+`  "created_at": "2026-10-24T08:27:54.961231Z",\n` +
+`  "completed_at": "2026-10-24T08:27:54.985412Z",\n` +
+`  "sandbox_provider": "mock",\n` +
+`  "idempotency_key": null\n` +
+`}\n\n` +
+`\x1b[33m✔ Fail-explicit policy verified: status='failed', error details captured, control plane remains healthy.\x1b[0m\n\n`
+      },
+      {
+        step: 5,
+        text: `\x1b[34m# Submitting invalid whitespace-only command (Schema Defense)\x1b[0m\n` +
+`\x1b[34m$\x1b[0m \x1b[1mcurl -i -X POST http://localhost:8000/runs \\\n` +
+`  -H "Content-Type: application/json" \\\n` +
+`  -d '{"command": "   \\n\\t  "}'\x1b[0m\n` +
+`HTTP/1.1 422 Unprocessable Entity\n` +
+`content-type: application/json\n\n` +
+`{\n` +
+`  "detail": [\n` +
+`    {\n` +
+`      "type": "value_error",\n` +
+`      "loc": ["body", "command"],\n` +
+`      "msg": "Value error, command cannot be empty or whitespace only"\n` +
+`    }\n` +
+`  ]\n` +
+`}\n\n` +
+`\x1b[32m✔ Pre-execution defense: Invalid input rejected immediately with 422 before queue allocation.\x1b[0m\n\n`
+      },
+      {
+        step: 6,
+        text: `\x1b[34m# Querying run ledger with status filter (?status=failed)\x1b[0m\n` +
+`\x1b[34m$\x1b[0m \x1b[1mcurl -s "http://localhost:8000/runs?status=failed&limit=5" | jq\x1b[0m\n` +
+`[\n` +
+`  {\n` +
+`    "run_id": "29320980-e98a-4f4e-b94f-e173ff5e4a6a",\n` +
+`    "status": "failed",\n` +
+`    "command": "exit 42",\n` +
+`    "output": null,\n` +
+`    "error": "sandbox command exited with status 42",\n` +
+`    "created_at": "2026-10-24T08:27:54.961231Z",\n` +
+`    "completed_at": "2026-10-24T08:27:54.985412Z",\n` +
+`    "sandbox_provider": "mock",\n` +
+`    "idempotency_key": null\n` +
+`  }\n` +
+`]\n\n` +
+`\x1b[32m✔ Auditable Ledger: Filtered query returned failed runs with zero cross-state pollution.\x1b[0m\n` +
+`\x1b[35m=================================================================\x1b[0m\n` +
+`\x1b[32m✔ ALL CELESTO CONTROL PLANE DEMO SCENARIOS VERIFIED SUCCESSFULLY!\x1b[0m\n` +
+`\x1b[35m=================================================================\x1b[0m\n`
+      }
+    ];
+
+    function ansiToHtml(text) {
+      let html = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      // ANSI color codes
+      html = html.replace(/\x1b\[1m([\s\S]*?)\x1b\[0m/g, '<span class="line-cmd">$1</span>');
+      html = html.replace(/\x1b\[34m([\s\S]*?)\x1b\[0m/g, '<span class="line-prompt">$1</span>');
+      html = html.replace(/\x1b\[32m([\s\S]*?)\x1b\[0m/g, '<span class="line-success">$1</span>');
+      html = html.replace(/\x1b\[33m([\s\S]*?)\x1b\[0m/g, '<span class="line-warn">$1</span>');
+      html = html.replace(/\x1b\[31m([\s\S]*?)\x1b\[0m/g, '<span class="line-error">$1</span>');
+      html = html.replace(/\x1b\[35m([\s\S]*?)\x1b\[0m/g, '<span class="line-info">$1</span>');
+      html = html.replace(/\x1b\[36m([\s\S]*?)\x1b\[0m/g, '<span class="line-json">$1</span>');
+      return html;
+    }
+
+    const fullPlainText = DEMO_STEPS.map(s => s.text).join("");
+    const totalLength = fullPlainText.length;
+
+    let charIndex = 0;
+    let isPlaying = true;
+    let playbackSpeed = 2; // default 2x
+    let timerId = null;
+
+    const terminalContent = document.getElementById("terminalContent");
+    const terminalBody = document.getElementById("terminalBody");
+    const playPauseBtn = document.getElementById("playPauseBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const slider = document.getElementById("timelineSlider");
+    const progressLabel = document.getElementById("progressLabel");
+    const toggleTranscriptBtn = document.getElementById("toggleTranscript");
+
+    function renderUpToIndex(targetIndex) {
+      charIndex = Math.min(Math.max(0, targetIndex), totalLength);
+      const sub = fullPlainText.substring(0, charIndex);
+      terminalContent.innerHTML = ansiToHtml(sub);
+      terminalBody.scrollTop = terminalBody.scrollHeight;
+
+      const pct = Math.floor((charIndex / totalLength) * 100);
+      slider.value = pct;
+      progressLabel.textContent = `${pct}%`;
+
+      // Update active step pill
+      let currentLen = 0;
+      document.querySelectorAll(".step-pill").forEach((pill, idx) => {
+        const stepLen = DEMO_STEPS[idx].text.length;
+        if (charIndex >= currentLen && charIndex < currentLen + stepLen) {
+          pill.classList.add("active");
+        } else {
+          pill.classList.remove("active");
+        }
+        currentLen += stepLen;
+      });
+    }
+
+    function tick() {
+      if (!isPlaying) return;
+
+      const increment = playbackSpeed === 999 ? totalLength : Math.max(1, Math.round(playbackSpeed * 3));
+      if (charIndex < totalLength) {
+        renderUpToIndex(charIndex + increment);
+        const delay = playbackSpeed === 999 ? 10 : Math.max(10, 30 / playbackSpeed);
+        timerId = setTimeout(tick, delay);
+      } else {
+        isPlaying = false;
+        playPauseBtn.textContent = "Play";
+        playPauseBtn.classList.remove("btn-primary");
+      }
+    }
+
+    playPauseBtn.addEventListener("click", () => {
+      if (isPlaying) {
+        isPlaying = false;
+        clearTimeout(timerId);
+        playPauseBtn.textContent = "Play";
+        playPauseBtn.classList.remove("btn-primary");
+      } else {
+        if (charIndex >= totalLength) {
+          renderUpToIndex(0);
+        }
+        isPlaying = true;
+        playPauseBtn.textContent = "Pause";
+        playPauseBtn.classList.add("btn-primary");
+        tick();
+      }
+    });
+
+    restartBtn.addEventListener("click", () => {
+      clearTimeout(timerId);
+      renderUpToIndex(0);
+      isPlaying = true;
+      playPauseBtn.textContent = "Pause";
+      playPauseBtn.classList.add("btn-primary");
+      tick();
+    });
+
+    slider.addEventListener("input", (e) => {
+      const pct = parseInt(e.target.value, 10);
+      const targetChar = Math.floor((pct / 100) * totalLength);
+      renderUpToIndex(targetChar);
+    });
+
+    document.querySelectorAll(".speed-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".speed-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        playbackSpeed = parseFloat(btn.dataset.speed);
+      });
+    });
+
+    document.querySelectorAll(".step-pill").forEach(pill => {
+      pill.addEventListener("click", () => {
+        const stepNum = parseInt(pill.dataset.step, 10);
+        let targetIndex = 0;
+        for (let i = 0; i < stepNum; i++) {
+          targetIndex += DEMO_STEPS[i].text.length;
+        }
+        renderUpToIndex(targetIndex);
+      });
+    });
+
+    let showingFull = false;
+    toggleTranscriptBtn.addEventListener("click", () => {
+      if (!showingFull) {
+        clearTimeout(timerId);
+        isPlaying = false;
+        playPauseBtn.textContent = "Play";
+        renderUpToIndex(totalLength);
+        toggleTranscriptBtn.textContent = "Interactive Mode";
+        showingFull = true;
+      } else {
+        toggleTranscriptBtn.textContent = "View Full Transcript";
+        showingFull = false;
+        renderUpToIndex(0);
+      }
+    });
+
+    // Start auto-play
+    tick();
+  </script>
+</body>
+</html>
