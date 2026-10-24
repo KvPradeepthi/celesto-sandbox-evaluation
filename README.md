@@ -49,9 +49,9 @@ The repository includes a reproducible, automated 20-run evaluation script (`scr
 | **Timed Out** | **2** |
 | **Rejected at API Boundary** | **2** |
 | **Unexpected Errors** | **0** |
-| **Submission Latency (p50)** | **40.91 ms** |
-| **Submission Latency (p95)** | **65.26 ms** |
-| **Maximum Submission Latency** | **67.24 ms** |
+| **Submission Latency (p50)** | **9.52 ms** |
+| **Submission Latency (p95)** | **14.67 ms** |
+| **Maximum Submission Latency** | **18.51 ms** |
 
 Raw evaluation measurements are recorded in [reports/reliability-results.json](reports/reliability-results.json).  
 Detailed report: [reports/reliability-eval.md](reports/reliability-eval.md).

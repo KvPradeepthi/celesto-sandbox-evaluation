@@ -6,7 +6,7 @@ submission and ledger reads. It writes raw measurements to
 `reports/reliability-results.json`; that file is generated from the latest local mock
 run, not hand-authored.
 
-The latest generated result (`2026-10-24T08:14:43Z`) is:
+The latest generated result (`2026-10-24T08:33:13Z`) is:
 
 | Metric | Result |
 |---|---:|
@@ -17,9 +17,9 @@ The latest generated result (`2026-10-24T08:14:43Z`) is:
 | timed out | 2 |
 | rejected requests | 2 |
 | unexpected errors | 0 |
-| submission latency p50 | 40.91 ms |
-| submission latency p95 | 65.26 ms |
-| maximum submission latency | 67.24 ms |
+| submission latency p50 | 9.52 ms |
+| submission latency p95 | 14.67 ms |
+| maximum submission latency | 18.51 ms |
 
 The complete machine-readable result is in
 [`reliability-results.json`](reliability-results.json).

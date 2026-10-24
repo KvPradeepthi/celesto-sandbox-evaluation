@@ -7,9 +7,9 @@
   "rejected": 2,
   "unexpected_errors": 0,
   "latency_ms": {
-    "p50": 40.91,
-    "p95": 65.26,
-    "max": 67.24
+    "p50": 9.52,
+    "p95": 14.67,
+    "max": 18.51
   },
-  "generated_at": "2026-10-24T08:14:43Z"
+  "generated_at": "2026-10-24T08:33:13Z"
 }
